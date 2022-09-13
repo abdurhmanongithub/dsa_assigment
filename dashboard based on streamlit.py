@@ -6,7 +6,10 @@ import pandas as pd  # read csv, df manipulation
 import plotly.express as px  # interactive charts
 import streamlit as st  # 🎈 data web app development
 import altair as alt
-
+import matplotlib.pyplot as plt
+import cufflinks as cf
+cf.go_offline()
+cf.set_config_file(offline=False, world_readable=True)
 df = pd.read_excel('data.xlsx',index_col ="NO")
 st.set_page_config(
     page_title="Data Science Assigment Dashboard [Abdurhman Abrar]",
@@ -15,6 +18,31 @@ st.set_page_config(
 )
 st.title("Data Science Assigment Dashboard [Abdurhman Abrar]")
 st.subheader('Data is from Ministry of Peace Project called Young Volunteers Management System')
+category_based_on_sex = df.groupby(['sex'])['sex'].count()
+x = df.groupby(['sex'])['sex'].count()
+totalMale = x['Male']
+totalFemale = x['Female']
+total = totalMale+totalFemale
+malePercent = totalMale/total
+femalePercent = totalFemale/total
+male, female = st.columns(2)
+male.metric("Total Male Percentage", str(round(malePercent*100,2))+"%")
+female.metric("Total Female Percentage",  str(round(femalePercent*100,2))+"%")
+male_to_female_prop = df.groupby(by=["sex"]).count()[['University']].rename(columns={"University":"Count"}).reset_index()
+
+male_to_female_pie_fig = male_to_female_prop.iplot(kind="pie", labels="sex", values="Count",
+                         title="Male to Female Proportion using PIE chart",
+                         asFigure=True,
+                        hole=0.4)
+
+male_to_female_pie_fig
+
+
+
+#worknig area
+
+
+
 simple_crosstab = pd.crosstab(df['Region'], df['University'])   
 st.bar_chart(simple_crosstab)
 
@@ -56,3 +84,4 @@ with col2:
     st.header("Volunteers ")
     region_crosstab = pd.crosstab(dfnew['Region'], dfnew['University'])   
     st.bar_chart(region_crosstab)
+
